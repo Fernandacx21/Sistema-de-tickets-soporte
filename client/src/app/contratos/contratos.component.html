@@ -1,0 +1,141 @@
+<div *ngIf="LoaderService.isLoading | async" class="loader">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg col-card">
+            <div class="row">
+                <div class="col">
+                    <input type="search" class="search-bar" name="filterCliente" [(ngModel)]="filterContrato"
+                        placeholder="Buscar por contrato...">
+                </div>
+                <div class="col">
+                    <button class="btn btn-success btn-sm btn-add" (click)="modal.open(newContrato)">
+                        <span><i class='bx bx-plus'></i></span>
+                        Agregar</button>
+                </div>
+            </div>
+            <table class="table table-stripped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Contrato</th>
+                        <th scope="col">Cliente</th>
+                        <th scope="col">Tipo de Contrato</th>
+                        <th scope="col">Fecha de Termino</th>
+                        <th scope="col">Documento</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let contrato of documentoList | slice: (page-1) * pageSize : page * pageSize 
+                        | searchContrato: filterContrato | filterCliente: filterClient | filterTipoContrato: filterTipo">
+                        <th scope="row"> #DOC-{{contrato.idDocumento}} </th>
+                        <td> {{contrato.nombre_documento}} </td>
+                        <td> {{contrato.cliente.nombre_cliente}} </td>
+                        <td> {{contrato.tipo_contrato}} </td>
+                        <td> {{contrato.fecha_termino}} </td>
+                        <td> <a href="{{contrato.documento}}" target="_blank"> <img class="pdf-icon"
+                                    src="../../assets/icons/337946.png" alt="PDF Icon"> </a> </td>
+                    </tr>
+                </tbody>
+            </table>
+            <ngb-pagination class="d-flex justify-content-center mt-3" [(page)]="page" [pageSize]="pageSize"
+                [collectionSize]="documentoList.length">
+                <ng-template ngbPaginationPrevious>
+                    < </ng-template>
+                        <ng-template ngbPaginationNext> > </ng-template>
+                        <ng-template ngbPaginationEllipsis>...</ng-template>
+            </ngb-pagination>
+        </div>
+        <div class="col-sm-3 col-card col-props filters">
+            <form #filtersForm="ngForm">
+                <div class="card">
+                    <h3 class="card-header header-props" style="text-align: center;">Filtros</h3>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="filterCliente">Cliente</label>
+                            <select class="form-select" name="filterClient" [(ngModel)]="filterClient">
+                                <option value="">Sin Filtros...</option>
+                                <option *ngFor="let cliente of ClienteService.cliente" [value]="cliente.nombre_cliente">
+                                    {{cliente.nombre_cliente}}</option>
+                            </select>
+                        </div> <br>
+                        <div class="form-group">
+                            <label for="filterTipoContrato">Tipo de Contrato</label>
+                            <select class="form-select" name="filterTipo" [(ngModel)]="filterTipo">
+                                <option value="">Sin Filtros...</option>
+                                <option value="Tiempo Indeterminado"> Tiempo Indeterminado </option>
+                                <option value="Tiempo Determinado"> Tiempo Determinado </option>
+                                <option value="Evento"> Evento </option>
+                            </select>
+                        </div> <br>
+                        <div class="form-group">
+                            <div class="row-sm-3">
+                                <label class="form-label">Filtro por Rango de Fecha de Termino</label>
+                                <input type="date" name="dateInit" [(ngModel)]="dateInit" class="form-control">
+                            </div> <br>
+                            <div class="row-sm-3">
+                                <input type="date" name="dateFinish" [(ngModel)]="dateFinish" class="form-control">
+                                <button class="btn btn-light btn-sm btn-apply"
+                                    (click)="dateFilter(filtersForm.value)">Aplicar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="row-sm-3">
+                            <button class="btn btn-primary btn-sm btn-reset" (click)="resetFiltros()">Quitar</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<ng-template #newContrato let-modal>
+    <form #addNewContrato="ngForm" (ngSubmit)="createContrato(addNewContrato)">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-basic-title">Nuevo Contrato</h3>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <div class="row-md-2">
+                    <label>Nombre</label>
+                    <input type="text" class="form-control" name="nombre_documento" #nombre_documento="ngModel"
+                        [(ngModel)]="ContratoService.selectedContrato.nombre_documento"><br>
+
+                    <label>Tipo de Contrato</label>
+                    <select class="form-select" name="tipo_contrato" #tipo_contrato="ngModel"
+                        [(ngModel)]="ContratoService.selectedContrato.tipo_contrato">
+                        <option value="Tiempo Indeterminado">Tiempo Indeterminado</option>
+                        <option value="Tiempo Determinado">Tiempo Determinado</option>
+                        <option value="Evento">Evento</option>
+                    </select><br>
+
+                    <label>Cliente</label>
+                    <select class="form-select" name="clienteIdCliente" #clienteIdCliente="ngModel"
+                        [(ngModel)]="ContratoService.selectedContrato.clienteIdCliente">
+                        <option *ngFor="let cliente of ClienteService.cliente" [value]="cliente.idCliente">
+                            {{cliente.nombre_cliente}}</option>
+                    </select><br>
+
+                    <label>Fecha de Termino</label>
+                    <input type="date" class="form-control" name="fecha_termino" #fecha_termino="ngModel"
+                        [(ngModel)]="ContratoService.selectedContrato.fecha_termino"><br>
+
+                    <label>Contrato</label>
+                    <input type="file" class="form-control" (change)="onDocumentoSelected($event)" name="documento"
+                        #documento="ngModel" [(ngModel)]="ContratoService.selectedContrato.documento">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-danger btn-sm"
+                (click)="modal.close('Cerrar click')">Cerrar</button>
+            <button type="submit" class="btn btn-outline-success btn-sm">Guardar</button>
+        </div>
+    </form>
+</ng-template>

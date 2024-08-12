@@ -1,0 +1,68 @@
+<div *ngIf="LoaderService.isLoading | async" class="loader">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-body allTickets">
+                    <h2 class="card-title">Tickets Registrados</h2>
+                    <h2 class="card-text"> # {{ticketLength}} </h2>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body allTickets">
+                    <h2 class="card-title">Tickets Pendientes</h2>
+                    <h2 class="card-text"> # {{ticketPendiente}} </h2>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body allTickets">
+                    <h2 class="card-title">Tickets En Proceso</h2>
+                    <h2 class="card-text"> # {{ticketEnProceso}} </h2>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body allTickets">
+                    <h2 class="card-title">Tickets Resuelto</h2>
+                    <h2 class="card-text"> # {{ticketResuelto}} </h2>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card">
+                <div class="card-body allTickets">
+                    <h2 class="card-title">Tickets Cerrado</h2>
+                    <h2 class="card-text"> # {{ticketCerrado}} </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <canvas id="ChartTicket" class="chartTicketPorUser"></canvas>
+        </div>
+        <div class="col-md-4">
+            <canvas id="ChartDept" class="chartTicketPorUser"></canvas>
+        </div>
+        <div class="col-md-4">
+            <canvas id="ChartClient" class="chartTicketPorUser"></canvas>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <canvas id="ChartTaskUser" class="chartTicketPorUser"></canvas>
+        </div>
+    </div>
+
+</div>

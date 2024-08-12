@@ -1,0 +1,136 @@
+<div *ngIf="LoaderService.isLoading | async" class="loader">
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-lg col-card">
+      <div class="row">
+        <div class="col">
+          <input type="search" class="search-bar" name="filterCliente" [(ngModel)]="filterCliente"
+            placeholder="Buscar por nombre...">
+        </div>
+        <div class="col">
+          <button class="btn btn-success btn-sm btn-add" (click)="openXlModal(addClient)">
+            <span><i class='bx bx-plus'></i></span>
+            Agregar</button>
+        </div>
+      </div>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nombre Del Cliente</th>
+            <th scope="col">Dirección</th>
+            <th scope="col">Correo Electrónico</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let client of ClientService.cliente | slice: (page-1) * pageSize : page * pageSize | clientSearch: filterCliente">
+            <th scope="row"> {{client.idCliente}} </th>
+            <td> {{client.nombre_cliente}} </td>
+            <td> {{client.direccion_cliente}} </td>
+            <td> {{client.email_cliente}} </td>
+            <td>
+              <a (click)="updateCliente(client); openXlModal(addClient) " type="button" class="a-edit"
+                ngbTooltip="Editar" [openDelay]="300" [closeDelay]="500">
+                <span class="edit" placement="top">
+                  <i class='bx bxs-edit-alt edit'></i>
+                </span>
+              </a>
+              <a (click)="deleteCliente(client.idCliente)" class="a-delete" ngbTooltip="Eliminar" [openDelay]="300"
+                [closeDelay]="500">
+                <span class="delete">
+                  <i class='bx bxs-trash-alt delete'></i>
+                </span>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <ngb-pagination class="d-flex justify-content-center mt-3" [(page)]="page" [pageSize]="pageSize"
+        [collectionSize]="ClientService.cliente.length">
+        <ng-template ngbPaginationPrevious>
+          < </ng-template>
+            <ng-template ngbPaginationNext>></ng-template>
+            <ng-template ngbPaginationEllipsis>...</ng-template>
+      </ngb-pagination>
+    </div>
+  </div>
+</div>
+
+<ng-template #addClient let-modal>
+  <form #createClient="ngForm" (ngSubmit)="addNewCliente(createClient)" class="form-inline" ngNativeValidate>
+    <input type="hidden" name="idCliente" idCliente="ngModel" [(ngModel)]="ClientService.selectedCliente.idCliente">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-basic-title">Cliente</h3>
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+      <div class="from-group">
+        <div class="row">
+          <div class="col">
+            <label>Nombre del cliente</label>
+            <input type="text" class="form-control" name="nombre_cliente" #nombre_cliente="ngModel"
+              [(ngModel)]="ClientService.selectedCliente.nombre_cliente" required>
+          </div>
+          <div class="col">
+            <label>Dirección</label>
+            <input type="text" class="form-control" name="direccion_cliente" #direccion_cliente="ngModel"
+              [(ngModel)]="ClientService.selectedCliente.direccion_cliente" required>
+          </div>
+          <div class="col">
+            <label>Teléfono</label>
+            <input type="text" class="form-control" name="telefono_cliente" #telefono_cliente="ngModel"
+              [(ngModel)]="ClientService.selectedCliente.telefono_cliente" maxlength="10"
+              onkeypress="return event.charCode>=48 && event.charCode<=57" required>
+            <small id="passwordHelpInline" class="text-muted">
+              Debe tener 10 caracteres
+            </small>
+          </div>
+          <div class=" col">
+            <label>Correo Electrónico</label>
+            <input type="email" class="form-control" name="email_cliente" #email_cliente="ngModel"
+              [(ngModel)]="ClientService.selectedCliente.email_cliente"
+              pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" required email>
+            <div *ngIf="email_cliente.invalid && (email_cliente.dirty || email_cliente.touched)">
+              <div *ngIf="email_cliente.errors?.['email']">
+                <p class="text-danger"> Ingresa un correo electrónico correcto</p>
+              </div>
+            </div>
+          </div><br><br><br><br><br>
+          <div class="row">
+            <div class="col">
+              <label>RFC</label>
+              <input type="text" class="form-control rfc-uppercase" name="rfc" #rfc="ngModel"
+                [(ngModel)]="ClientService.selectedCliente.rfc" minlength="12" maxlength="13" required>
+              <small id="passwordHelpInline" class="text-muted">
+                Debe tener entre 12 y 13 caracteres
+              </small>
+            </div>
+            <div class="col">
+              <label>Tipo de Cliente</label>
+              <select type="email" class="form-select" name="tipo_cliente" #tipo_cliente="ngModel"
+                [(ngModel)]="ClientService.selectedCliente.tipo_cliente"
+                required>
+                <option value="Persona Fisica">Persona Fisica</option>
+                <option value="Persona Moral">Persona Moral</option>
+              </select>
+            </div>
+            <div class="col">
+              <label>Horas de Soporte Por Ticket</label>
+              <input type="number" class="form-control" name="horas_soporte" #horas_soporte="ngModel"
+                [(ngModel)]="ClientService.selectedCliente.horas_soporte" required>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-danger btn-sm" (click)="modal.close('Cerrar click')">Cerrar</button>
+      <button type="submit" class="btn btn-outline-success btn-sm">Guardar</button>
+    </div>
+  </form>
+</ng-template>

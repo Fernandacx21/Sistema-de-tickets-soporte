@@ -1,0 +1,137 @@
+<div *ngIf="LoaderService.isLoading | async" class="loader">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg col-card">
+            <div class="row">
+                <div class="col">
+                    <input type="search" class="search-bar" name="filterServico" [(ngModel)]="filterServicio"
+                        placeholder="Buscar por nombre de servicio...">
+                </div>
+                <div class="col">
+                    <button class="btn btn-success btn-sm btn-add" (click)="modal.open(addServicio)">
+                        <span><i class='bx bx-plus'></i></span>
+                        Agregar</button>
+                </div>
+            </div>
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Nombre Del Servicio</th>
+                        <th scope="col">Descripción</th>
+                        <th scope="col">Precio</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let servicio of ServicioService.servicio | slice: (page-1) * pageSize : page * pageSize | servicioSearch: filterServicio">
+                        <th scope="row"> SERV-{{servicio.idServicio}} </th>
+                        <td> {{servicio.nombre_servicio}} </td>
+                        <td> {{servicio.descripcion_servicio}} </td>
+                        <td> {{servicio.costo_servicio | currency: 'MXN'}} </td>
+                        <td>
+                            <a (click)="updateServicio(servicio); modal.open(addServicio) " type="button" class="a-edit"
+                                ngbTooltip="Editar" [openDelay]="300" [closeDelay]="500">
+                                <span class="edit" placement="top">
+                                    <i class='bx bxs-edit-alt edit'></i>
+                                </span>
+                            </a>
+                            <a (click)="deleteServicio(servicio.idServicio)" class="a-delete" ngbTooltip="Eliminar"
+                                [openDelay]="300" [closeDelay]="500">
+                                <span class="delete">
+                                    <i class='bx bxs-trash-alt delete'></i>
+                                </span>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <ngb-pagination class="d-flex justify-content-center mt-3" [(page)]="page" [pageSize]="pageSize"
+                [collectionSize]="ServicioService.servicio.length">
+                <ng-template ngbPaginationPrevious>
+                    < </ng-template>
+                        <ng-template ngbPaginationNext>></ng-template>
+                        <ng-template ngbPaginationEllipsis>...</ng-template>
+            </ngb-pagination>
+        </div>
+        <div class="col-sm-3 col-card col-props filters">
+            <form #priceForm="ngForm">
+                <div class="card">
+                    <h3 class="card-header header-props" style="text-align: center;">Filtros</h3>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="form-group">
+                                <div class="row-sm-3">
+                                    <label class="priceRange">Rango De Precio</label>
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="input-group mb-3">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" class="form-control" name="minPrice"
+                                                    [(ngModel)]="minPrice" aria-label="Amount (to the nearest dollar)">
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <div class="input-group mb-3">
+                                                <span class="input-group-text">$</span>
+                                                <input type="number" class="form-control" name="maxPrice"
+                                                    [(ngModel)]="maxPrice" aria-label="Amount (to the nearest dollar)">
+                                            </div>
+                                            <button class="btn btn-light btn-sm btn-apply"
+                                                (click)="filtrarPorRangoDePrecio(priceForm.value)">Aplicar</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="row-sm-3">
+                            <button class="btn btn-primary btn-sm btn-reset" (click)="resetFiltros()">Quitar</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<ng-template #addServicio let-modal>
+    <form #addNewService="ngForm" (ngSubmit)="addNewServicio(addNewService)" class="form-inline" ngNativeValidate>
+        <div class="modal-header">
+            <input type="hidden" name="idServicio" idServicio="ngModel"
+                [(ngModel)]="ServicioService.selectedServicio.idServicio">
+            <h3 class="modal-title" id="modal-basic-title">Servicio</h3>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <div class="row-md-2">
+                    <label>Nombre</label>
+                    <input type="text" class="form-control" name="nombre_servicio" #nombre_servicio="ngModel"
+                        [(ngModel)]="ServicioService.selectedServicio.nombre_servicio" required><br>
+
+                    <label>Descripción</label>
+                    <textarea class="form-control" cols="3" rows="3" name="descripcion_servicio"
+                        #descripcion_servicio="ngModel"
+                        [(ngModel)]="ServicioService.selectedServicio.descripcion_servicio" required></textarea><br>
+
+                    <label>Precio</label>
+                    <input type="text" class="form-control" maxlength="5" name="costo_servicio"
+                        #costo_servicio="ngModel" [(ngModel)]="ServicioService.selectedServicio.costo_servicio"
+                        onkeypress="return event.charCode>=48 && event.charCode<=57" required><br>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-danger btn-sm"
+                (click)="modal.close('Cerrar click')">Cerrar</button>
+            <button type="submit" class="btn btn-outline-success btn-sm">Guardar</button>
+        </div>
+    </form>
+</ng-template>

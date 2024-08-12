@@ -1,0 +1,62 @@
+<div class="container" *ngIf="AuthService.Logueado();">
+  
+  <header>
+    <nav class="navbar-header">
+      <div class="container">
+        <div class="d-inline p-4 text-white">
+          <button mat-icon-button [matMenuTriggerFor]="menu" class="menu-btn icons notify">
+            <i class='bx bxs-bell' [matBadge]="0" matBadgeColor="warn"></i>
+          </button>
+          <mat-menu #menu="matMenu">
+            <div class="mat-menu">
+            
+            </div>
+          </mat-menu>
+        </div>
+        <div class="d-inline p-4 text-white">
+          <p class="icons"> Bienvenido, {{auth.NOMBRE_USUARIO}}! </p>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <nav class="sidebar-navigation">
+    <ul>
+      <li class="active">
+        <i class='bx bx-atom'></i>
+
+      </li>
+      <li>
+        <a href="/dashboard"><i class='bx bxs-dashboard'></i></a>
+        <span class="tooltip">Dashboard</span>
+      </li>
+      <li>
+        <a href="/ticket"><i class='bx bxs-notepad'></i></a>
+        <span class="tooltip">Tickets</span>
+      </li>
+      <li>
+        <a href="/servicios"><i class='bx bx-spreadsheet'></i></a>
+        <span class="tooltip">Servicios</span>
+      </li>
+      <li>
+        <a href="/contratos"><i class='bx bx-book-open'></i></a>
+        <span class="tooltip">Contartos</span>
+      </li>
+      <li>
+        <a href="/cliente"><i class='bx bxs-city'></i></a>
+        <span class="tooltip">Clientes</span>
+      </li>
+      <li>
+        <a href="/departamento"><i class='bx bx-home-alt-2'></i></a>
+        <span class="tooltip">Departamentos</span>
+      </li>
+      <li *ngIf="auth.ROL == 1">
+        <a href="/usuario"><i class='bx bx-user'></i></a>
+        <span class="tooltip">Usuarios</span>
+      </li>
+      <li>
+        <a (click)="authLogOut()"><i class='bx bx-log-out'></i></a>
+        <span class="tooltip">Salir</span>
+      </li>
+    </ul>
+  </nav>
+</div>

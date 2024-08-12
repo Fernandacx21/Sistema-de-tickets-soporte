@@ -1,0 +1,265 @@
+<div *ngIf="LoaderService.isLoading | async" class="loader">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+
+<div class="container">
+
+    <div class="row mat-tab-scroll">
+        <div class="col-lg col-card">
+            <div class="card" *ngFor="let ticket of TicketList">
+                <h2 class="card-header"> #INC-{{ticket.idTicket}} {{ticket.asunto}} </h2>
+                <div class="card-body">
+                    <h2 class="card-title"> {{ticket.cliente.nombre_cliente}} </h2>
+                    <p class="card-text dates-text"> Creado por {{ticket.user_ticket}} el: ({{ticket.fecha_creacion |
+                        date:
+                        'short'}}) | Ultima
+                        actualización: ({{ticket.updatedAt | date: 'short'}}) </p>
+                    <h3 class="card-text desc-text">Descripción del incidente: </h3>
+                    <p class="card-text"> {{ticket.descripcion_ticket}} </p>
+                </div>
+            </div> <br>
+
+            <div class="col-lg">
+                <mat-tab-group mat-align-tabs="center"> <br>
+                    <mat-tab label="Notas Privadas">
+                        <div class="row-lg">
+                            <div class="row-sm" *ngFor="let privateNote of NotaPrivadaList"> <br>
+                                <div class="card">
+                                    <h4 class="card-header"> <b> {{privateNote.usuario.nombre_usuario}} </b>
+                                        <p class="user-txt"> agregó una nota privada ({{privateNote.createdAt | date:
+                                            'short'}}) </p>
+                                    </h4>
+                                    <div class="card-body">
+                                        <p class="card-text"> {{privateNote.nota_privada}} </p>
+                                    </div>
+                                </div>
+                            </div> <br>
+                            <div class="row-sm">
+                                <a class="btn btn-primary btn-sm btn-add" (click)="modal.open(notaPriv)">
+                                    <span><i class='bx bxs-edit-alt'></i> Agregar</span> </a>
+                            </div>
+                        </div>
+                    </mat-tab>
+                    <mat-tab label="Notas Públicas">
+                        <div class="row-lg">
+                            <div class="row-sm" *ngFor="let publicNote of NotaPublicaList"> <br>
+                                <div class="card">
+                                    <h4 class="card-header"> <b> {{publicNote.usuario.nombre_usuario}} </b>
+                                        <p class="user-txt"> agregó una nota privada ({{publicNote.createdAt | date:
+                                            'short'}}) </p>
+                                    </h4>
+                                    <div class="card-body">
+                                        <p class="card-text"> {{publicNote.nota_publica}} </p>
+                                    </div>
+                                </div>
+                            </div> <br>
+                            <div class="row-sm">
+                                <a class="btn btn-primary btn-sm btn-add" (click)="modal.open(notaPublic)">
+                                    <span><i class='bx bxs-edit-alt'></i> Agregar</span> </a>
+                            </div>
+                        </div>
+                    </mat-tab>
+                    <mat-tab label="Tareas">
+                        <div class="row-lg"> <br>
+                            <div class="row-sm" *ngFor="let task of TareaList"><br>
+                                <div class="card">
+                                    <h4 class="card-header"> <b> {{task.asunto_tarea}} </b> <span class="edit-btn">
+                                            <a (click)="openTareaModal(Task); updateTarea(task)"> <i
+                                                    class='bx bx-edit'></i> </a>
+                                        </span>
+                                        <p class="user-txt"> {{task.generado_por}} Agrego una tarea asignada a
+                                            {{task.usuario.usuario}} ({{task.fecha_creacion | date: 'short'}}) </p>
+                                    </h4>
+
+                                    <div class="card-body">
+                                        <p class="card-text"> {{task.descripcion_tarea}} </p>
+                                    </div>
+                                </div>
+                            </div> <br>
+                            <div class="row-sm">
+                                <a class="btn btn-primary btn-sm btn-add" (click)="openTareaModal(Task)">
+                                    <span><i class='bx bxs-edit-alt'></i> Agregar</span> </a>
+                            </div>
+                        </div>
+                    </mat-tab>
+                </mat-tab-group>
+            </div>
+        </div>
+
+        <div class="col-md-2 col-card col-props">
+            <div class="card">
+                <h4 class="card-header header-props"> Propiedades </h4>
+                <div class="card-body">
+                    <form #editTicket="ngForm" (ngSubmit)="updateTicket(editTicket)" ngNativeValidate>
+                        <input type="hidden" name="idTicket" #idTicket="ngModel" [(ngModel)]="idTicketParam">
+                        <div class="row" *ngFor="let ticket of TicketList">
+                            <div class="form-group">
+                                <div class="row-sm-3">
+                                    <label>Estatus</label>
+                                    <select class="form-control" name="status" #status="ngModel"
+                                        [(ngModel)]="ticket.status" required>
+                                        <option value="Pendiente"> Pendiente </option>
+                                        <option value="En Proceso"> En Proceso </option>
+                                        <option value="Resuelto"> Resuelto </option>
+                                        <option value="Cerrado"> Cerrado </option>
+                                    </select>
+                                </div><br>
+                                <div class="row-sm-3" *ngIf="status.value == 'En Proceso'">
+                                    <label for="">Hora de Inicio</label>
+                                    <input type="time" name="hora_inicio" #hora_inicio="ngModel" class="form-control"
+                                        [(ngModel)]="ticket.hora_inicio" required>
+                                </div>
+                                <div class="row-sm-3" *ngIf="status.value == 'Cerrado'">
+                                    <label for="">Hora de Termino</label>
+                                    <input type="time" name="hora_termino" #hora_termino="ngModel" class="form-control"
+                                        [(ngModel)]="ticket.hora_termino" required>
+                                </div><br>
+                                <div class="row-sm-3">
+                                    <label>Prioridad</label>
+                                    <select class="form-control" name="prioridad" #prioridad="ngModel"
+                                        [(ngModel)]="ticket.prioridad" required>
+                                        <option value="Baja">Baja</option>
+                                        <option value="Media">Media</option>
+                                        <option value="Alta">Alta</option>
+                                        <option value="Urgente">Urgente</option>
+                                    </select>
+                                </div><br>
+                                <div class="row-sm-3">
+                                    <label>SLA</label>
+                                    <select class="form-control" name="sla" #sla="ngModel" [(ngModel)]="ticket.sla">
+                                        <option value="SLA">SLA</option>
+                                        <option value="Default SLA">Default SLA</option>
+                                    </select>
+                                </div><br>
+                                <div class="row-sm-3">
+                                    <label>Técnico asignado</label>
+                                    <select class="form-control" name="usuarioIdUsuario" #usuarioIdUsuario="ngModel"
+                                        [(ngModel)]="ticket.usuario.idUsuario" required>
+                                        <option hidden> {{ticket.usuario.nombre_usuario}} </option>
+                                        <option *ngFor="let user of UserService.usuario" [value]="user.idUsuario">
+                                            {{user.nombre_usuario}}</option>
+                                    </select>
+                                </div><br>
+                                <div class="row-sm-3">
+                                    <label>Departamento</label>
+                                    <select class="form-control" name="departamentoIdDepartamento"
+                                        #departamentoIdDepartamento="ngModel"
+                                        [(ngModel)]="ticket.departamento.idDepartamento" required>
+                                        <option hidden>
+                                            {{ticket.departamento.nombre_departamento}}
+                                        </option>
+                                        <option *ngFor="let dept of DeptService.Dept" [value]="dept.idDepartamento">
+                                            {{dept.nombre_departamento}} </option>
+                                    </select>
+                                </div> <br>
+                                <div class="row-sm-3">
+                                    <button class="btn btn-primary btn-sm btn-update" type="submit">Actualizar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #notaPriv let-modal>
+    <form #newPrivNote="ngForm" (ngSubmit)="addNotaPrivada(newPrivNote)" ngNativeValidate>
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-basic-title">Nota Privada</h3>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <div class="row">
+                    <textarea placeholder="Escribe tu nota privada" cols="10" rows="3" name="nota_privada"
+                        class="form-control" #nota_privada="ngModel" required
+                        [(ngModel)]="PrivateNoteService.selectedNotaPrivada.nota_privada">
+                    </textarea>
+                    <input type="hidden" name="ticketIdTicket" #ticketIdTicket="ngModel" [(ngModel)]="idTicketParam">
+                    <input type="hidden" name="usuarioIdUsuario" #usuarioIdUsuario="ngModel"
+                        [(ngModel)]="auth.IDUSUARIO">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-danger btn-sm"
+                (click)="modal.close('Cerrar click')">Cerrar</button>
+            <button type="submit" class="btn btn-outline-success btn-sm">Guardar</button>
+        </div>
+    </form>
+</ng-template>
+
+<ng-template #notaPublic let-modal>
+    <form #addNewPublicNote="ngForm" (ngSubmit)="addNotaPublica(addNewPublicNote)" ngNativeValidate>
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-basic-title">Nota Publica</h3>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+        <div class="modal-body">
+            <textarea cols="10" rows="3" class="form-control" placeholder="Escribe tu nota" name="nota_publica"
+                #nota_publica="ngModel" [(ngModel)]="PublicNoteService.selectedNotaPublica.nota_publica" required></textarea>
+            <input type="hidden" name="ticketIdTicket" #ticketIdTicket="ngModel" [(ngModel)]="idTicketParam">
+            <input type="hidden" name="usuarioIdUsuario" #usuarioIdUsuario="ngModel" [(ngModel)]="auth.IDUSUARIO">
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-danger btn-sm"
+                (click)="modal.close('Cerrar click')">Cerrar</button>
+            <button type="submit" class="btn btn-outline-success btn-sm">Guardar</button>
+        </div>
+    </form>
+</ng-template>
+
+<ng-template #Task let-modal>
+    <form #addNewTask="ngForm" (ngSubmit)="addNewTarea(addNewTask)" ngNativeValidate>
+        <input type="hidden" name="ticketIdTicket" #TicketIdTicket="ngModel" [(ngModel)]="idTicketParam">
+        <input type="hidden" name="idTarea" #idTarea="ngModel" [(ngModel)]="TaskService.selectedTarea.idTarea">
+        <input type="hidden" name="generado_por" #generado_por="ngModel" [(ngModel)]="auth.NOMBRE_USUARIO">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-basic-title">Tarea</h3>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <div class="row">
+                    <input type="hidden" name="generado_por" #generado_por="ngModel" [(ngModel)]="auth.USUARIO">
+                    <div class="col-sm">
+                        <label for="">Asunto</label>
+                        <input type="text" class="form-control" placeholder="Ingresa el asunto" name="asunto_tarea"
+                            #asunto_tarea="ngModel" [(ngModel)]="TaskService.selectedTarea.asunto_tarea" required>
+                    </div>
+                    <div class="col-sm">
+                        <label for="">Estatus</label>
+                        <select class="form-control" name="status_tarea" #status_tarea="ngModel"
+                            [(ngModel)]="TaskService.selectedTarea.status_tarea" required>
+                            <option value="Pendiente">Pendiente</option>
+                            <option value="En Proceso">En Proceso</option>
+                            <option value="Cerrada">Cerrada</option>
+                        </select>
+                    </div>
+                    <div class="col-sm">
+                        <label for="">Técnico asignado</label>
+                        <select class="form-control" name="usuarioIdUsuario" #usuarioIdUsuario="ngModel"
+                            [(ngModel)]="TaskService.selectedTarea.usuarioIdUsuario" required>
+                            <option *ngFor="let user of UserService.usuario" [value]="user.idUsuario"> {{user.usuario}}
+                                - {{user.nombre_usuario}} </option>
+                        </select>
+                    </div>
+                </div> <br>
+                <div class="row">
+                    <div class="col-lg">
+                        <textarea name="" id="" cols="30" rows="10" class="form-control" name="descripcion_tarea"
+                            #descripcion_tarea="ngModel" [(ngModel)]="TaskService.selectedTarea.descripcion_tarea"
+                            placeholder="Describe la tarea a realizar" required></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-danger btn-sm"
+                (click)="modal.close('Cerrar click')">Cerrar</button>
+            <button type="submit" class="btn btn-outline-success btn-sm">Guardar</button>
+        </div>
+    </form>
+</ng-template>

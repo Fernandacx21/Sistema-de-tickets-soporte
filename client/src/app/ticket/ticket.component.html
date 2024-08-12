@@ -1,0 +1,272 @@
+<div *ngIf="LoaderService.isLoading | async" class="loader">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+
+<div class="container-md">
+    <div class="row">
+        <div class="col-lg col-card">
+            <div class="row">
+                <div class="col">
+                    <input type="search" name="filterSearch" [(ngModel)]="filterSearch" class="search-bar"
+                        placeholder="Buscar ticket..." #search>
+                </div>
+                <div class="col">
+                    <a class="btn btn-success btn-sm btn-add" (click)="OpenXLModal(addTicket)">
+                        <span><i class='bx bx-plus'></i></span> Agregar</a>
+                </div>
+            </div>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Fecha de creación</th>
+                        <th scope="col">Ticket</th>
+                        <th scope="col">Prioridad</th>
+                        <th scope="col">SLA</th>
+                        <th scope="col">Departamento</th>
+                        <th scope="col">Técnico asignado</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr
+                        *ngFor="let ticket of Ticket | slice: (page-1) * pageSize : page * pageSize
+                        | status:filterStatus | prioridad:filterPriority | tecnico:filterTech | search:filterSearch; let i = index">
+                        <th scope="row"> {{ticket.fecha_creacion | date: "medium"}} </th>
+                        <td> <a [routerLink]="['/ticket-detail', ticket.idTicket]" class="a-detail-ticket">{{
+                                ticket.asunto }}</a> </td>
+                        <td> {{ticket.prioridad}} </td>
+                        <td> {{ticket.sla}} </td>
+                        <td> {{ticket.departamento.nombre_departamento}} </td>
+                        <td> {{ticket.usuario.nombre_usuario}} </td>
+                        <td>
+                            <a (click)="getHorasByTicket(ticket.idTicket); modal.open(Horas)" type="button"
+                                class="a-horas" ngbTooltip="Horas de Soporte" [openDelay]="300" [closeDelay]="500">
+                                <span class="horas" placement="top">
+                                    <i class='bx bx-stopwatch hours'></i>
+                                </span>
+                            </a>
+                            <a (click)="updateTicket(ticket); OpenXLModal(addTicket) " type="button" class="a-edit"
+                                ngbTooltip="Editar" [openDelay]="300" [closeDelay]="500">
+                                <span class="edit" placement="top">
+                                    <i class='bx bxs-edit-alt edit'></i>
+                                </span>
+                            </a>
+                            <a (click)="deleteTicket(ticket.idTicket)" class="a-delete" ngbTooltip="Eliminar"
+                                [openDelay]="300" [closeDelay]="500">
+                                <span class="delete">
+                                    <i class='bx bxs-trash-alt delete'></i>
+                                </span>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <ngb-pagination class="d-flex justify-content-center mt-3" [(page)]="page" [pageSize]="pageSize"
+                [collectionSize]="Ticket.length">
+                <ng-template ngbPaginationPrevious>
+                    < </ng-template>
+                        <ng-template ngbPaginationNext> > </ng-template>
+                        <ng-template ngbPaginationEllipsis>...</ng-template>
+            </ngb-pagination>
+        </div>
+        <div class="col-md-2 col-card col-props filters">
+            <form #dateForm="ngForm">
+                <div class="card">
+                    <h3 class="card-header header-props" style="text-align: center;">Filtros</h3>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="form-group">
+                                <div class="row-sm-3">
+                                    <label class="form-label">Filtrar por Estatus</label>
+                                    <select class="form-select filter-status" name="filterStatus"
+                                        [(ngModel)]="filterStatus">
+                                        <option value="">Sin filtro...</option>
+                                        <option value="Pendiente">Pendiente</option>
+                                        <option value="En Proceso">En Proceso</option>
+                                        <option value="Resuelto">Resuelto</option>
+                                        <option value="Cerrado">Cerrado</option>
+                                    </select>
+                                </div><br>
+                                <div class="row-sm-3">
+                                    <label class="form-label">Filtrar por Prioridad</label>
+                                    <select class="form-select filter-status" id="prioridad" name="filterPriority"
+                                        [(ngModel)]="filterPriority">
+                                        <option value="">Sin filtro...</option>
+                                        <option value="Baja">Baja</option>
+                                        <option value="Media">Media</option>
+                                        <option value="Alta">Alta</option>
+                                        <option value="Urgente">Urgente</option>
+                                    </select>
+                                </div><br>
+                                <div class="row-sm-3">
+                                    <label class="form-label">Filtrar por Técnico</label>
+                                    <select class="form-select filter-status" id="prioridad" name="filterTech"
+                                        [(ngModel)]="filterTech">
+                                        <option value="">Sin filtro...</option>
+                                        <option *ngFor="let tech of UserService.usuario" [value]="tech.nombre_usuario">
+                                            {{tech.nombre_usuario}}</option>
+                                    </select>
+                                </div><br>
+                                <div class="row-sm-3">
+                                    <label class="form-label">Filtro por Rango de Fecha</label>
+                                    <input type="date" name="dateInit" [(ngModel)]="dateInit" class="form-control">
+                                </div> <br>
+                                <div class="row-sm-3">
+                                    <input type="date" name="dateFinish" [(ngModel)]="dateFinish" class="form-control">
+                                    <button class="btn btn-light btn-sm btn-apply"
+                                        (click)="dateFilter(dateForm.value)">Aplicar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="row-sm-3">
+                            <button class="btn btn-primary btn-sm btn-reset" (click)="resetFiltros()">Quitar</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+<ng-template #addTicket let-modal>
+    <form #NewTicket="ngForm" (ngSubmit)="addNewTicket(NewTicket)" ngNativeValidate>
+        <input type="hidden" name="idTicket" #idTicket="ngModel" [(ngModel)]="TicketService.selectedTicket.idTicket">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-basic-title">Ticket</h3>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md">
+                        <label>Cliente</label>
+                        <select class="form-select" name="clienteIdCliente" #clienteIdCliente="ngModel"
+                            [(ngModel)]="TicketService.selectedTicket.clienteIdCliente" required>
+                            <option *ngFor="let client of ClientService.cliente" [value]="client.idCliente">
+                                {{client.nombre_cliente}} </option>
+                        </select>
+                    </div>
+                    <div class="col-md">
+                        <label>Asunto</label>
+                        <input type="text" class="form-control" placeholder="Ingresa el asunto" name="asunto"
+                            #asunto="ngModel" [(ngModel)]="TicketService.selectedTicket.asunto" required>
+                    </div>
+                </div> <br>
+                <div class="row">
+                    <div class="col-md">
+                        <label for="descripcion">Descripción del Ticket</label>
+                        <textarea name="" id="descripcion" rows="3" class="form-control" name="descripcion_ticket"
+                            #descripcion_ticket="ngModel" [(ngModel)]="TicketService.selectedTicket.descripcion_ticket"
+                            placeholder="Describe el incidente presentado" required></textarea>
+                    </div>
+                </div> <br>
+                <div class="row">
+                    <div class="col-md-4">
+                        <label>Servicio</label>
+                        <select class="form-select" name="servicioIdServicio" #servicioIdServicio="ngModel"
+                            [(ngModel)]="TicketService.selectedTicket.servicioIdServicio" required>
+                            <option *ngFor="let serv of ServicioService.servicio" [value]="serv.idServicio">
+                                {{serv.nombre_servicio}} </option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="">SLA</label>
+                        <select class="form-select" name="sla" #sla="ngModel"
+                            [(ngModel)]="TicketService.selectedTicket.sla">
+                            <option selected hidden>Selecciona una opción...</option>
+                            <option value="Default SLA">Default SLA</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="">Servicio</label>
+                        <select class="form-select" name="status" #status="ngModel"
+                            [(ngModel)]="TicketService.selectedTicket.status" required>
+                            <option selected hidden>Selecciona una opción...</option>
+                            <option value="Pendiente">Pendiente</option>
+                            <option value="En Proceso">En Proceso</option>
+                            <option value="Resuelto">Resuelto</option>
+                            <option value="Cerrado">Cerrado</option>
+                        </select>
+                    </div>
+                </div> <br>
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="">Prioridad</label>
+                        <select class="form-select" name="prioridad" #prioridad="ngModel"
+                            [(ngModel)]="TicketService.selectedTicket.prioridad" required>
+                            <option selected hidden>Selecciona una opción...</option>
+                            <option value="Baja">Baja</option>
+                            <option value="Media">Media</option>
+                            <option value="Alta">Alta</option>
+                            <option value="Urgente">Urgente</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4" *ngIf="status.value == 'En Proceso'">
+                        <label for="">Hora de inicio</label>
+                        <input type="time" name="hora_inicio" #hora_inicio="ngModel" class="form-control"
+                            [(ngModel)]="TicketService.selectedTicket.hora_inicio" required>
+                    </div>
+                    <div class="col-md-4" *ngIf="status.value == 'Cerrado'">
+                        <label for="">Hora de termino</label>
+                        <input type="time" name="hora_termino" #hora_termino="ngModel" class="form-control"
+                            [(ngModel)]="TicketService.selectedTicket.hora_termino" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="">Técnico asignado</label>
+                        <select class="form-select" name="usuarioIdUsuario" #usuarioIdUsuario="ngModel"
+                            [(ngModel)]="TicketService.selectedTicket.usuarioIdUsuario" id="idUser"
+                            (change)="getUsuario()">
+                            <option selected hidden>Selecciona una opción...</option>
+                            <option *ngFor="let user of UserService.usuario" [value]="user.idUsuario">
+                                {{user.nombre_usuario}} </option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="">Departamento</label>
+                        <input type="hidden" class="form-control" name="departamentoIdDepartamento"
+                            #departamentoIdDepartamento="ngModel" [(ngModel)]="UserList.departamento.idDepartamento">
+                        <!--Motivo visual del formulario debido a que se debe registrar el id del Dept no el nombre-->
+                        <input class="form-control" type="text" name="nombreDept" #nombreDept="ngModel" disabled
+                            [(ngModel)]="UserList.departamento.nombre_departamento">
+                    </div>
+                    <input type="hidden" name="user_ticket" #user_ticket="ngModel" [(ngModel)]="auth.USUARIO">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-danger btn-sm"
+                (click)="modal.close('Cerrar click')">Cerrar</button>
+            <button type="submit" class="btn btn-outline-success btn-sm">Guardar</button>
+        </div>
+    </form>
+</ng-template>
+
+<ng-template #Horas let-modal>
+    <div class="modal-header">
+        <input type="hidden" name="idTicket" #idTicket="ngModel" [(ngModel)]="HoraTicket.idTicket">
+        <h3 class="modal-title" id="modal-basic-title">Horas de Soporte</h3>
+        <button type="button" class="btn-close" aria-label="Close"
+            (click)="reset(); modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <div class="col-sm">
+            <label for="hours">Horas de Soporte Técnico:</label>
+            <input type="text" id="hours" name="hours" #hours="ngModel" class="hours-text"
+                [(ngModel)]="HoraTicket.hours" readonly>
+        </div><br>
+        <div class="col-sm" *ngIf="hours.value >= 8; else noExcedio">
+            Costo extra: <span class="costo-extra">{{HoraTicket.hours * 20 | currency}}</span>
+        </div>
+
+        <ng-template #noExcedio>
+            <h3 class="cost">No hay costos extra</h3>
+        </ng-template>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger btn-sm"
+            (click)="reset(); modal.close('Cerrar click')">Cerrar</button>
+    </div>
+</ng-template>

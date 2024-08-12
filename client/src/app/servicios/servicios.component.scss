@@ -1,0 +1,77 @@
+.container {
+    margin-top: 5%;
+}
+
+.table {
+    width: 100%;
+    text-align: center;
+    margin: 0 auto;
+}
+
+tr:hover {
+    background: #f1f1f1;
+}
+
+.btn {
+    margin-left: 12%;
+    margin-top: 5%;
+    margin-bottom: 10px;
+}
+
+.bx {
+    margin-top: 5px;
+}
+
+.edit {
+    color: #e1c812;
+    padding: 1 1;
+}
+
+.delete {
+    color: red;
+}
+
+.a-delete {
+    margin-left: 10px;
+}
+
+.btn-add {
+    float: right;
+    margin-right: 160px;
+}
+
+.search-bar {
+    margin-left: 160px;
+}
+
+.btn-reset {
+    float: right;
+}
+
+.btn-apply {
+    float: right;
+}
+
+.card {
+    width: 100%;
+}
+
+::ng-dept .pagination .page-item .page-link {
+    border-radius: 0 !important;
+}
+
+::ng-deep .pagination .page-link {
+    border-top-style: none !important;
+    border-bottom-style: none !important;
+    background-color: #ffffff !important;
+    color: black !important;
+    border: none;
+}
+
+.rfc-uppercase {
+    text-transform: uppercase;
+}
+
+.card {
+    margin-top: 8%;
+}

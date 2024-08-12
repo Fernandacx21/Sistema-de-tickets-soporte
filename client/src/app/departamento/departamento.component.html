@@ -1,0 +1,82 @@
+<div *ngIf="LoaderService.isLoading | async" class="loader">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg col-card">
+            <div class="row">
+                <div class="col">
+                    <input type="search" name="filterDept" [(ngModel)]="filterDept" class="search-bar" placeholder="Buscar departamento...">
+                </div>
+                <div class="col">
+                    <button class="btn btn-success btn-sm btn-add" (click)="modal.open(addDept)">
+                        <span><i class='bx bx-plus'></i></span>
+                        Agregar</button>
+                </div>
+            </div>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Nombre Del Departamento</th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let dept of DeptService.Dept | slice: (page-1) * pageSize : page * pageSize
+                        | searchDept: filterDept">
+                        <th scope="row"> {{dept.idDepartamento}} </th>
+                        <td> {{dept.nombre_departamento}} </td>
+                        <td>
+                            <a (click)="updateDepartamento(dept); modal.open(addDept) " type="button" class="a-edit" ngbTooltip="Editar"
+                                [openDelay]="300" [closeDelay]="500">
+                                <span class="edit" placement="top">
+                                    <i class='bx bxs-edit-alt edit'></i>
+                                </span>
+                            </a>
+                            <a (click)="deleteDepartamento(dept.idDepartamento)" class="a-delete" ngbTooltip="Eliminar" [openDelay]="300" [closeDelay]="500">
+                                <span class="delete">
+                                    <i class='bx bxs-trash-alt delete'></i>
+                                </span>
+                            </a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <ngb-pagination class="d-flex justify-content-center mt-3" [(page)]="page" [pageSize]="pageSize"
+                [collectionSize]="DeptService.Dept!.length">
+                <ng-template ngbPaginationPrevious><</ng-template>
+                <ng-template ngbPaginationNext>></ng-template>
+                <ng-template ngbPaginationEllipsis>...</ng-template>
+            </ngb-pagination>
+        </div>
+    </div>
+
+</div>
+
+<ng-template #addDept let-modal>
+    <form #DeptForm="ngForm" (ngSubmit)="addDepartamentos(DeptForm)" class="form-inline" ngNativeValidate> 
+        <input type="hidden" name="idDepartamento" #idDepartamento="ngModel" [(ngModel)]="DeptService.selectedDepartamento.idDepartamento">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modal-basic-title">Departamento</h3>
+            <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="dept">Nombre Del Departamento:</label>
+                <input type="text" id="dept" placeholder="Ingresa el nombre del departamento" class="form-control"
+                    name="nombre_departamento" #nombre_departamento="ngModel" required minlength="2" maxlength="15"
+                    [(ngModel)]="DeptService.selectedDepartamento.nombre_departamento">
+                <small id="passwordHelpInline" class="text-muted">
+                    Debe tener entre 2 y 10 caracteres
+                </small>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-outline-danger btn-sm"
+                (click)="modal.close('Cerrar click')">Cerrar</button>
+            <button type="submit" class="btn btn-outline-success btn-sm">Guardar</button>
+        </div>
+    </form>
+</ng-template>

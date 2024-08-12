@@ -1,0 +1,131 @@
+<div *ngIf="LoaderService.isLoading | async" class="loader">
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-lg col-card">
+      <div class="row">
+        <div class="col">
+          <input type="search" class="search-bar" name="filterUser" [(ngModel)]="filterUser" 
+          placeholder="Buscar usuario o departamento...">
+        </div>
+        <div class="col">
+          <button class="btn btn-success btn-sm btn-add" (click)="modal.open(addUser)">
+            <span><i class='bx bx-plus'></i></span>
+            Agregar</button>
+        </div>
+      </div>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Usuario</th>
+            <th scope="col">Correo Electrónico</th>
+            <th scope="col">Departamento</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of usuario | slice: (page-1) * pageSize : page * pageSize | searchUser: filterUser">
+            <th scope="row"> {{user.idUsuario}} </th>
+            <td> {{user.nombre_usuario}} </td>
+            <td> {{user.usuario}} </td>
+            <td> {{user.email}} </td>
+            <td> {{user.departamento.nombre_departamento}} </td>
+            <td>
+              <a (click)="updateUsuario(user); modal.open(addUser)" type="button" class="a-edit" ngbTooltip="Editar"
+                [openDelay]="300" [closeDelay]="500">
+                <span class="edit" placement="top">
+                  <i class='bx bxs-edit-alt edit'></i>
+                </span>
+              </a>
+              <a (click)="deleteUsuario(user.idUsuario)" type="button" class="a-delete" ngbTooltip="Eliminar"
+                [openDelay]="300" [closeDelay]="500">
+                <span class="delete">
+                  <i class='bx bxs-trash-alt delete'></i>
+                </span>
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <ngb-pagination class="d-flex justify-content-center mt-3" [(page)]="page" [pageSize]="pageSize"
+                [collectionSize]="UserService.usuario!.length">
+                <ng-template ngbPaginationPrevious> < </ng-template>
+                <ng-template ngbPaginationNext> > </ng-template>
+                <ng-template ngbPaginationEllipsis>...</ng-template>
+            </ngb-pagination>
+    </div>
+  </div>
+
+</div>
+
+<ng-template #addUser let-modal>
+  <form #addNewUser="ngForm" (ngSubmit)="addUsuario(addNewUser)" class="form-inline" ngNativeValidate>
+    <input type="hidden" name="idUsuario" idUsuario="ngModel" [(ngModel)]="UserService.selectedUsuario.idUsuario">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-basic-title">Departamento</h3>
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <div class="row-md-2">
+          <label for="">Nombre</label>
+          <input type="text" class="form-control" name="nombre_usuario" #nombre_usuario="ngModel"
+            [(ngModel)]="UserService.selectedUsuario.nombre_usuario" placeholder="Ingresa el nombre" required> <br>
+
+          <label for="">Usuario</label>
+          <input type="text" class="form-control" name="usuario" #usuario="ngModel"
+            [(ngModel)]="UserService.selectedUsuario.usuario" placeholder="Ingresa el usuario" required> <br>
+
+          <label for="">Rol</label>
+          <select class="form-control" name="rol" #rol="ngModel" [(ngModel)]="UserService.selectedUsuario.rol"
+          required>
+            <option selected hidden> Selecciona una opción... </option>
+            <option value="1">Administrador</option>
+            <option value="0">Empleado</option>
+            <option value="2">Cliente</option>
+          </select> <br>
+
+          <div *ngIf="rol.value == 2">
+            <label>ID Del Cliente</label>
+            <select class="form-select" name="idClienteUser" #idClienteUser="ngModel" [(ngModel)]="UserService.selectedUsuario.idClienteUser" required>
+                <option *ngFor="let client of cliente" [value]="client.idCliente">
+                  {{client.idCliente}} - {{client.nombre_cliente}}
+                </option>
+            </select>
+          </div> <br>
+
+          <label for="">Correo Electrónico</label>
+          <input type="text" class="form-control" name="email" #email="ngModel"
+            [(ngModel)]="UserService.selectedUsuario.email" placeholder="Ingresa el correo elctrónico"
+            pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" required email> <br>
+            <div *ngIf="email.invalid && (email.dirty || email.touched)">
+              <div *ngIf="email.errors?.['email']">
+                 <p class="text-danger"> Ingresa un correo electrónico correcto</p>
+              </div>
+          </div>
+
+          <label for="">Contraseña</label>
+          <input type="password" class="form-control" name="password" #password="ngModel"
+            [(ngModel)]="UserService.selectedUsuario.password" placeholder="Ingresa la contraseña" required> <br>
+
+          <label for="">Departamento</label>
+          <select name="departamentoIdDepartamento" #departamentoIdDepartamento="ngModel"
+            [(ngModel)]="UserService.selectedUsuario.departamentoIdDepartamento" class="form-control" required>
+            <option hidden selected>Elige un departamento</option>
+            <option *ngFor="let Dept of DeptService.Dept" [value]="Dept.idDepartamento"> {{Dept.nombre_departamento}}
+            </option>
+          </select>
+
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-danger btn-sm" (click)="modal.close('Cerrar click')">Cerrar</button>
+      <button type="submit" class="btn btn-outline-success btn-sm">Guardar</button>
+    </div>
+  </form>
+</ng-template>

@@ -1,0 +1,111 @@
+.container-md {
+    margin-top: 5%;
+}
+
+.table {
+    width: 75%;
+    text-align: center;
+    margin: 0 auto;
+}
+
+tr:hover {
+    background: #f1f1f1;
+}
+
+.btn {
+    margin-left: 12%;
+    margin-top: 5%;
+    margin-bottom: 10px;
+}
+
+.bx {
+    margin-top: 5px;
+}
+
+.edit {
+    color: #e1c812;
+    padding: 1 1;
+}
+
+.horas {
+    color: #000000;
+    margin-right: 10px;
+}
+
+.a-horas {
+    text-decoration: none;
+}
+
+.delete {
+    color: red;
+}
+
+.a-delete {
+    margin-left: 10px;
+}
+
+.a-detail-ticket {
+    text-decoration: none;
+    color: #1218e1;
+}
+
+.hours-text {
+    border: none;
+    font-size: 16px;
+    margin-left: 10px;
+}
+
+.costo-extra {
+    border: none;
+    font-size: 16px;
+    margin-left: 5px;
+}
+
+.hours-text:focus {
+    border: none;
+}
+.cost {
+    text-align: center;
+}
+
+.filters {
+    float: right;
+    width: 20%;
+}
+
+.table {
+    width: 100%;
+}
+
+.btn-add {
+    float: right;
+    top: 5;
+}
+
+.btn-add:hover {
+    background: #007657;
+}
+
+.btn-add:focus {
+    outline: none;
+}
+
+.btn-reset {
+    float: right;
+}
+
+.btn-apply {
+    float: right;
+}
+
+::ng-dept .pagination .page-item .page-link {
+    border-radius: 0 !important;
+}
+
+::ng-deep .pagination .page-link {
+    border-top-style: none !important;
+    border-bottom-style: none !important;
+    background-color: #ffffff !important;
+    color: black !important;
+    border: none;
+}
